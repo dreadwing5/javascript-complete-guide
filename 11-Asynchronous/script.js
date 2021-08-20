@@ -3,6 +3,11 @@
 const btn = document.querySelector(".btn-country");
 const countriesContainer = document.querySelector(".countries");
 
+const renderError = function (msg) {
+  countriesContainer.insertAdjacentText("beforeend", msg);
+  // countriesContainer.style.opacity = 1;
+};
+
 const renderCountry = (data, className = "") => {
   const html = `
 <article class="country ${className}">
@@ -19,7 +24,7 @@ const renderCountry = (data, className = "") => {
 </article>
 `;
   countriesContainer.insertAdjacentHTML("beforeend", html);
-  countriesContainer.style.opacity = 1;
+  // countriesContainer.style.opacity = 1;
 };
 ///////////////////////////////////////
 /* 
@@ -109,8 +114,21 @@ const getCountryData = function (country) {
     .then((response) => response.json())
     .then((data) => {
       renderCountry(data, "neighbour");
+    })
+    //catch can't handle 404 error
+    .catch((err) => {
+      console.log(`${err} 😧😧😧`);
+      renderError(`Something went wrong 😧😧😧 ${err.message}. Try again!`);
+    })
+    //useful for hiding a spinner when a request is done
+    .finally(() => {
+      console.log("Promise finished");
+      countriesContainer.style.opacity = 1;
     });
 };
 
-// getCountryData("portugal");
-getCountryData("germany");
+btn.addEventListener("click", function () {
+  getCountryData("germany");
+});
+
+getCountryData("bdsd");
