@@ -3,11 +3,6 @@
 const btn = document.querySelector(".btn-country");
 const countriesContainer = document.querySelector(".countries");
 
-const renderError = function (msg) {
-  countriesContainer.insertAdjacentText("beforeend", msg);
-  // countriesContainer.style.opacity = 1;
-};
-
 const renderCountry = (data, className = "") => {
   const html = `
 <article class="country ${className}">
@@ -100,29 +95,44 @@ setTimeout(() => {
 // };
 
 //Simplified version, flat chain promises
+
+const renderError = function (msg) {
+  countriesContainer.insertAdjacentText("beforeend", msg);
+  // countriesContainer.style.opacity = 1;
+};
+
+const getJSON = function (url, errorMsg = "Something went wrong!") {
+  return fetch(url).then((response) => {
+    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+    return response.json();
+  });
+};
 const getCountryData = function (country) {
-  fetch(`https://restcountries.eu/rest/v2/name/${country}`)
-    .then((response) => response.json())
+  getJSON(
+    `https://restcountries.eu/rest/v2/name/${country}`,
+    "Country not found"
+  )
     .then((data) => {
       renderCountry(data[0]);
       const neighbor = data[0].borders[0];
 
-      if (!neighbor) return;
+      if (!neighbor) throw new Error("Neighbor not found");
 
-      return fetch(`https://restcountries.eu/rest/v2/alpha/${neighbor}`); //always return promise and handle it outside
+      return getJSON(
+        `https://restcountries.eu/rest/v2/alpha/${neighbor}`,
+        "Country not found"
+      ); //always return promise and handle it outside
     })
-    .then((response) => response.json())
     .then((data) => {
       renderCountry(data, "neighbour");
     })
-    //catch can't handle 404 error
+    //catch can't handle 404, we have to manually do that
     .catch((err) => {
       console.log(`${err} 😧😧😧`);
       renderError(`Something went wrong 😧😧😧 ${err.message}. Try again!`);
     })
     //useful for hiding a spinner when a request is done
     .finally(() => {
-      console.log("Promise finished");
       countriesContainer.style.opacity = 1;
     });
 };
@@ -131,4 +141,4 @@ btn.addEventListener("click", function () {
   getCountryData("germany");
 });
 
-getCountryData("bdsd");
+getCountryData("australia");
