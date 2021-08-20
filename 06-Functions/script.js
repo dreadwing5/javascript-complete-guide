@@ -224,7 +224,7 @@ const g = function () {
   };
 };
 
-const h = function () {
+/* const h = function () {
   const b = 2;
   f = function () {
     console.log(b * 23);
@@ -248,3 +248,14 @@ const boardPassengers = function (n, wait) {
 };
 const perGroup = 1000;
 boardPassengers(180, 3);
+ */
+
+const cb = param => {
+  console.log(`The result is ${param}`);
+};
+const divide = (x, y, callback) => {
+  callback(x / y);
+  callback(x % y);
+};
+
+divide(6, 8, cb);
