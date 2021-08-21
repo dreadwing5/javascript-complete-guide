@@ -395,7 +395,7 @@ createImage("img/img-1.jpg")
 ///////////////////////////////////////
 //Async and Await
 
-const getPosition = function () {
+/* const getPosition = function () {
   return new Promise(function (resolve, reject) {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
@@ -409,6 +409,7 @@ const whereAmI = async function () {
 
     const { latitude: lat, longitude: lng } = pos.coords;
 
+    //Reverse geocoding
     const response = await fetch(
       `https://geocode.xyz/${lat},${lng}?geoit=json`
     );
@@ -416,26 +417,81 @@ const whereAmI = async function () {
     if (!response.ok)
       throw new Error(`Problem getting location data (${response.status})`);
 
-    const { country } = await response.json();
+    const dataGeo = await response.json();
+
+    //country data
     const res = await fetch(
-      `https://restcountries.eu/rest/v2/name/${country}?fullText=true`
+      `https://restcountries.eu/rest/v2/name/${dataGeo.countrysss}?fullText=true`
     );
 
     if (!res.ok) throw new Error(`Country not found ${res.status}`);
 
     const data = await res.json();
-    console.log(data);
     renderCountry(data[0]);
+
+    return `You are in ${dataGeo.city}, ${dataGeo.country}`;
   } catch (error) {
     console.error(error);
     renderError(` 😱 ${error.message}`);
+
+    //reject promise returned from async function
+    // throw error;
   }
 };
 
 btn.addEventListener("click", whereAmI);
-whereAmI();
-whereAmI();
-whereAmI();
-whereAmI();
 
-console.log("first");
+console.log("1. Will get location");
+
+// const city = whereAmI();
+// console.log(city);
+// whereAmI()
+//   .then((city) => console.log(`2. ${city}`)) // even if there is an error it will still resolve
+//   .catch((err) => console.error(`2. ${err.message}`))
+//   .finally(() => console.log("3. Finished getting location"));
+
+(async function () {
+  try {
+    const city = await whereAmI();
+    if (!city) throw new Error("No position found");
+    console.log(`2. ${city}`);
+  } catch (err) {
+    console.error(`2. ${err.message}`);
+  } finally {
+    console.log("3. Finished getting location");
+  }
+})(); */
+
+const getJSON = function (url, errorMsg = "Something went wrong!") {
+  return fetch(url).then((response) => {
+    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+    return response.json();
+  });
+};
+
+const get3countries = async function (c1, c2, c3) {
+  try {
+    // const [data1] = await getJSON(
+    //   `https://restcountries.eu/rest/v2/name/${c1}?fullText=true`
+    // );
+    // const [data2] = await getJSON(
+    //   `https://restcountries.eu/rest/v2/name/${c2}?fullText=true`
+    // );
+    // const [data3] = await getJSON(
+    //   `https://restcountries.eu/rest/v2/name/${c3}?fullText=true`
+    // );
+    // console.log([data1.capital, data2.capital, data3.capital]);
+
+    //This will run in parallel
+    const data = await Promise.all([
+      getJSON(`https://restcountries.eu/rest/v2/name/${c1}?fullText=true`),
+      getJSON(`https://restcountries.eu/rest/v2/name/${c2}?fullText=true`),
+      getJSON(`https://restcountries.eu/rest/v2/name/${c3}?fullText=true`),
+    ]);
+    console.log(data.map((d) => d[0].capital));
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+get3countries("portugal", "canada", "india");
