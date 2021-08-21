@@ -22,6 +22,11 @@ const renderCountry = (data, className = "") => {
   countriesContainer.insertAdjacentHTML("beforeend", html);
   countriesContainer.style.opacity = 1;
 };
+
+const renderError = function (msg) {
+  countriesContainer.insertAdjacentText("beforeend", msg);
+  countriesContainer.style.opacity = 1;
+};
 ///////////////////////////////////////
 /* 
 
@@ -397,20 +402,40 @@ const getPosition = function () {
 };
 
 const whereAmI = async function () {
-  const pos = await getPosition();
-  if (!pos) throw new Error("No position found");
-  const { latitude: lat, longitude: lng } = pos.coords;
-  const response = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-  if (!response.ok)
-    throw new Error(`Something went wrong (${response.status})`);
-  const { country } = await response.json();
-  const res = await fetch(
-    `https://restcountries.eu/rest/v2/name/${country}?fullText=true`
-  );
-  const data = await res.json();
-  console.log(data);
-  renderCountry(data[0]);
+  try {
+    const pos = await getPosition();
+
+    if (!pos) throw new Error("No position found");
+
+    const { latitude: lat, longitude: lng } = pos.coords;
+
+    const response = await fetch(
+      `https://geocode.xyz/${lat},${lng}?geoit=json`
+    );
+
+    if (!response.ok)
+      throw new Error(`Problem getting location data (${response.status})`);
+
+    const { country } = await response.json();
+    const res = await fetch(
+      `https://restcountries.eu/rest/v2/name/${country}?fullText=true`
+    );
+
+    if (!res.ok) throw new Error(`Country not found ${res.status}`);
+
+    const data = await res.json();
+    console.log(data);
+    renderCountry(data[0]);
+  } catch (error) {
+    console.error(error);
+    renderError(` 😱 ${error.message}`);
+  }
 };
 
 btn.addEventListener("click", whereAmI);
+whereAmI();
+whereAmI();
+whereAmI();
+whereAmI();
+
 console.log("first");
