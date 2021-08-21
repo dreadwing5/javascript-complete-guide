@@ -20,7 +20,7 @@ const renderCountry = (data, className = "") => {
 </article>
 `;
   countriesContainer.insertAdjacentHTML("beforeend", html);
-  // countriesContainer.style.opacity = 1;
+  countriesContainer.style.opacity = 1;
 };
 ///////////////////////////////////////
 /* 
@@ -327,7 +327,7 @@ PART 1
 1. Create a function 'createImage' which receives imgPath as an input. This function returns a promise which creates a new image (use document.createElement('img')) and sets the .src attribute to the provided image path. When the image is done loading, append it to the DOM element with the 'images' class, and resolve the promise. The fulfilled value should be the image element itself. In case there is an error loading the image ('error' event), reject the promise.
 If this part is too tricky for you, just watch the first part of the solution.
 PART 2
-2. Comsume the promise using .then and also add an error handler;
+2. Consume the promise using .then and also add an error handler;
 3. After the image has loaded, pause execution for 2 seconds using the wait function we created earlier;
 4. After the 2 seconds have passed, hide the current image (set display to 'none'), and load a second image (HINT: Use the image element returned by the createImage promise to hide the current image. You will need a global variable for that 😉);
 5. After the second image has loaded, pause execution for 2 seconds again;
@@ -386,3 +386,31 @@ createImage("img/img-1.jpg")
   })
   .catch((err) => console.error(err));
  */
+
+///////////////////////////////////////
+//Async and Await
+
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = async function () {
+  const pos = await getPosition();
+  if (!pos) throw new Error("No position found");
+  const { latitude: lat, longitude: lng } = pos.coords;
+  const response = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+  if (!response.ok)
+    throw new Error(`Something went wrong (${response.status})`);
+  const { country } = await response.json();
+  const res = await fetch(
+    `https://restcountries.eu/rest/v2/name/${country}?fullText=true`
+  );
+  const data = await res.json();
+  console.log(data);
+  renderCountry(data[0]);
+};
+
+btn.addEventListener("click", whereAmI);
+console.log("first");
