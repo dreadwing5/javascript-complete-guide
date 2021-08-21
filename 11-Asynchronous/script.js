@@ -165,7 +165,7 @@ TEST COORDINATES 2: -33.933, 18.474
 GOOD LUCK 😀
 */
 
-const whereAmI = function (lat, lang) {
+/* const whereAmI = function (lat, lang) {
   fetch(`https://geocode.xyz/${lat},${lang}?geoit=json`)
     .then((response) => {
       if (!response.ok)
@@ -194,4 +194,124 @@ const whereAmI = function (lat, lang) {
 //test coordinates
 whereAmI(19.037, 72.873);
 whereAmI(-33.933, 18.474);
-whereAmI(52.508, 13.381);
+whereAmI(52.508, 13.381); */
+
+/* console.log("Test Start");
+setTimeout(() => console.log("0 Sec timer"), 0);
+Promise.resolve("Resolved promise 1").then((res) => console.log(res)); //micro task queue
+
+Promise.resolve("Resolved promise 2").then((res) => {
+  for (let i = 0; i < 1000; i++) {
+    console.log(res);
+  }
+});
+console.log("Test end");
+ */
+
+/* const lotteryPromise = new Promise(function (resolve, reject) {
+  console.log("Lottery draw is happening 😴");
+  setTimeout(function () {
+    if (Math.random() >= 0.5) {
+      resolve("You WIN 💰"); //mark this promise as fulfilled
+    } else {
+      reject(new Error("You lost your money 💩"));
+    }
+  }, 2000);
+});
+
+//consuming promise
+lotteryPromise
+  .then((res) => console.log(res))
+  .catch((err) => console.error(err)); */
+
+//Promisify setTimeout
+/* const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+wait(1)
+  .then(() => {
+    console.log("I waited 1 seconds");
+    return wait(1);
+  })
+  .then(() => {
+    console.log("I waited 2 second");
+    return wait(1);
+  })
+  .then(() => console.log("I waited 3 second"));
+ */
+// setTimeout(() => {
+//   console.log("1 second passed");
+//   setTimeout(() => {
+//     console.log("2 seconds passed");
+//     setTimeout(() => {
+//       console.log("3 seconds passed");
+//     }, 1000);
+//   }, 1000);
+// }, 1000);
+
+//These promises will be resolved quickly
+
+/* Promise.resolve("abc").then((x) => console.log(x));
+Promise.reject(new Error("Problem")).catch((x) => console.error(x)); */
+
+//Callback
+/* navigator.geolocation.getCurrentPosition(
+  (position) => console.log(position),
+  (err) => console.error(err)
+);
+ */
+console.log("Getting Position");
+
+//converting callback to promise
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    // navigator.geoLocation.getCurrentPosition(
+    //   (position) => resolve(position),
+    //   (err) => reject(err)
+    // );
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+// getPosition().then((pos) => console.log(pos));
+
+const whereAmI = function () {
+  getPosition()
+    .then((pos) => {
+      if (!pos) throw new Error("No position found");
+      const { latitude: lat, longitude: lng } = pos.coords;
+      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    })
+
+    .then((response) => {
+      if (!response.ok)
+        throw new Error(`Something went wrong (${response.status})`);
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      console.log(`You are in ${data.state}, ${data.country}`);
+      return fetch(
+        `https://restcountries.eu/rest/v2/name/${data.country}?fullText=true`
+      );
+    })
+    .then((res) => {
+      if (!res.ok) throw new Error(`Country not found ${res.status}`);
+      return res.json();
+    })
+    .then((data) => {
+      console.log(data);
+      renderCountry(data[0]);
+    })
+    .catch((err) => {
+      console.error(`${err.message}. Try again!`);
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+    });
+};
+
+btn.addEventListener("click", whereAmI);
