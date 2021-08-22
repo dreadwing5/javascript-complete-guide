@@ -13,10 +13,10 @@
 // console.log(ShoppingCart.totalPrice);
 
 // default imports, use 1 default import per module
-import add, { cart } from "./shoppingCart.js"; //Bad example
-add("pizza", 2);
-add("bread", 5);
-add("apples", 4);
+// import add, { cart } from "./shoppingCart.js"; //Bad example
+// add("pizza", 2);
+// add("bread", 5);
+// add("apples", 4);
 
 // console.log(cart);
 
@@ -55,7 +55,7 @@ console.log(ShoppingCart2.shippingCost); //undefined
 // ShoppingCart2.orderStock("bread", 1); */
 
 // import cloneDeep from "./node_modules/lodash-es/cloneDeep.js";
-import { cloneDeep } from "lodash-es";
+/* import { cloneDeep } from "lodash-es";
 
 const state = {
   cart: [
@@ -81,7 +81,7 @@ console.log(cart.find((item) => item.product === "bread"));
 
 Promise.resolve("hello").then((data) => console.log(data));
 
-import "core-js/stable"; //pollyfill
+import "core-js/stable"; //polyfill
 
 //Pollyfilling async functions
-import "regenerator-runtime/runtime";
+import "regenerator-runtime/runtime"; */

@@ -1,45 +1,73 @@
-var sc = [
-  { product: 'bread', quantity: 6 },
-  { product: 'pizza', quantity: 2 },
-  { product: 'milk', quantity: 4 },
-  { product: 'water', quantity: 10 },
-];
+"use strict";
+const budget = Object.freeze([
+  { value: 250, description: "Sold old TV 📺", user: "jonas" },
+  { value: -45, description: "Groceries 🥑", user: "jonas" },
+  { value: 3500, description: "Monthly salary 👩‍💻", user: "jonas" },
+  { value: 300, description: "Freelancing 👩‍💻", user: "jonas" },
+  { value: -1100, description: "New iPhone 📱", user: "jonas" },
+  { value: -20, description: "Candy 🍭", user: "matilda" },
+  { value: -125, description: "Toys 🚂", user: "matilda" },
+  { value: -1800, description: "New Laptop 💻", user: "jonas" },
+]);
 
-var allow = {
-  lisbon: 5,
-  others: 7,
+const spendingLimits = Object.freeze({
+  jonas: 1500,
+  matilda: 100,
+});
+// spendingLimits.jay = 200;
+// console.log(spendingLimits);
+
+const getLimit = (limits, user) => limits?.[user] ?? 0;
+
+const addExpense = function (
+  state,
+  limits,
+  value,
+  description,
+  user = "jonas"
+) {
+  const cleanUser = user.toLowerCase();
+
+  return value <= getLimit(limits, cleanUser)
+    ? [...state, { value: -value, description, user: cleanUser }]
+    : state;
 };
+const newBudget1 = addExpense(budget, spendingLimits, 10, "Pizza 🍕");
+const newBudget2 = addExpense(
+  newBudget1,
+  spendingLimits,
+  100,
+  "Going to movies 🍿",
+  "Matilda"
+);
+const newBudget3 = addExpense(newBudget2, spendingLimits, 200, "Stuff", "Jay");
 
-var description = '';
+console.log(newBudget3);
 
-var check = function (city) {
-  if (sc.length > 0) {
-    var allowed;
-    if (city == 'lisbon') {
-      allowed = allow.lisbon;
-    } else {
-      allowed = allow.others;
-    }
+//This will return a new array with the new expense added -> pure function
+const checkExpense = (state, limits) =>
+  state.map((entry) =>
+    entry.value < -getLimit(limits, entry.user)
+      ? { ...entry, flag: "limit" }
+      : entry
+  );
 
-    for (item of sc) {
-      if (item.quantity > allowed) item.quantity = allowed;
-    }
-  }
-};
-check('lisbon');
-console.log(sc);
+const finalBudget = checkExpense(newBudget3, spendingLimits);
+console.log(finalBudget);
 
-var createDescription = function () {
-  var first = sc[0];
-  var p = first.product;
-  var q = first.quantity;
+const logBigExpenses = (state, bigLimit) =>
+  // let output = "";
+  // for (const entry of budget)
+  //   output +=
+  //     entry.value <= -bigLimit ? `${entry.description.slice(-2)}  / ` : "";
+  // output = output.slice(0, -2); // Remove last '/ '
+  // console.log(output);
+  state
+    .filter((entry) => entry.value <= -bigLimit)
+    .map((entry) => entry.description.slice(-2))
+    .join(" / ");
+// .reduce((str, cur) => `${str} / ${cur.description.slice(-2)}`, "");
 
-  if (sc.length > 1) {
-    description = 'Order with ' + q + ' ' + p + ', etc...';
-  } else {
-    description = 'Order with ' + q + ' ' + p + '.';
-  }
-};
-createDescription();
-
-console.log(description);
+console.log("budget", budget);
+const output = logBigExpenses(finalBudget, 500);
+console.log(output);
