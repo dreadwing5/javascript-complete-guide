@@ -20,7 +20,9 @@
 
 // console.log(cart);
 
-const ShoppingCart2 = (function () {
+//Replaced by named imports
+
+/* const ShoppingCart2 = (function () {
   const cart = [];
   const shippingCost = 10;
   const totalPrice = 237;
@@ -50,4 +52,27 @@ ShoppingCart2.addToCart("bread", 1);
 ShoppingCart2.addToCart("pizza", 2);
 console.log(ShoppingCart2);
 console.log(ShoppingCart2.shippingCost); //undefined
-// ShoppingCart2.orderStock("bread", 1);
+// ShoppingCart2.orderStock("bread", 1); */
+
+// import cloneDeep from "./node_modules/lodash-es/cloneDeep.js";
+import { cloneDeep } from "lodash-es";
+
+const state = {
+  cart: [
+    { product: "bread", quantity: 5 },
+    { product: "pizza", quantity: 5 },
+  ],
+  user: { loggedIn: true },
+};
+
+const stateClone = Object.assign({}, state); //just referenced is assigned
+const stateDeepClone = cloneDeep(state); //shallow copy
+state.user.loggedIn = false;
+console.log(stateClone);
+
+console.log(stateDeepClone);
+
+//this will not cause page reload, i.e state will remain same( login,signup)
+if (module.hot) {
+  module.hot.accept();
+}
