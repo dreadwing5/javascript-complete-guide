@@ -12,11 +12,11 @@
 // ShoppingCart.addToCart("bread", 1);
 // console.log(ShoppingCart.totalPrice);
 
-//default imports, use 1 default import per module
-// import add, { cart } from "./shoppingCart.js"; //Bad example
-// add("pizza", 2);
-// add("bread", 5);
-// add("apples", 4);
+// default imports, use 1 default import per module
+import add, { cart } from "./shoppingCart.js"; //Bad example
+add("pizza", 2);
+add("bread", 5);
+add("apples", 4);
 
 // console.log(cart);
 
@@ -76,3 +76,12 @@ console.log(stateDeepClone);
 if (module.hot) {
   module.hot.accept();
 }
+
+console.log(cart.find((item) => item.product === "bread"));
+
+Promise.resolve("hello").then((data) => console.log(data));
+
+import "core-js/stable"; //pollyfill
+
+//Pollyfilling async functions
+import "regenerator-runtime/runtime";
